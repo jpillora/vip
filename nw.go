@@ -13,6 +13,12 @@ type IPNet struct {
 	Mask
 }
 
+//CIDR is an alias for IPNet
+type CIDR = IPNet
+
+//IPNets is a slice of IPNet
+type IPNets []IPNet
+
 //EmptyIPNet is 0.0.0.0/0
 var EmptyIPNet = IPNet{}
 
@@ -66,25 +72,25 @@ func (nw IPNet) String() string {
 	return nw.IP.String() + "/" + nw.Mask.String()
 }
 
-//Network returns the network address
+//NetworkIP returns the network address
 //For example 10.0.0.7/24 returns 10.0.0.0
 func (nw IPNet) NetworkIP() IP {
 	return IP(uint32(nw.IP) & nw.BitMask())
 }
 
-//IsNetwork determines if the IP is network's
+//IsNetworkIP determines if the IP is network's
 //network address
 func (nw IPNet) IsNetworkIP(ip IP) bool {
 	return nw.Mask != 32 && nw.NetworkIP() == ip
 }
 
-//Broadcast returns the broadcast address
+//BroadcastIP returns the broadcast address
 //For example 10.0.0.7/24 returns 10.0.0.255
 func (nw IPNet) BroadcastIP() IP {
 	return IP(uint32(nw.IP) | ^nw.BitMask())
 }
 
-//IsBroadcast determines if the IP is network's
+//IsBroadcastIP determines if the IP is network's
 //broadcast address
 func (nw IPNet) IsBroadcastIP(ip IP) bool {
 	return nw.Mask != 32 && nw.BroadcastIP() == ip
@@ -121,6 +127,16 @@ func (nw *IPNet) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+//MarshalText ...
+func (nw IPNet) MarshalText() (text []byte, err error) {
+	return []byte(nw.String()), nil
+}
+
+//UnmarshalText ...
+func (nw *IPNet) UnmarshalText(text []byte) error {
+	return nw.UnmarshalJSON(text)
+}
+
 //StdNet converts a standard-library *net.IPNet to a vip.IPNet
 func StdNet(nw *net.IPNet) IPNet {
 	m, err := StdMask(nw.Mask)
@@ -133,7 +149,7 @@ func StdNet(nw *net.IPNet) IPNet {
 	}
 }
 
-//ToStd
+//ToStd ...
 func (nw IPNet) ToStd() net.IPNet {
 	return net.IPNet{
 		IP:   nw.NetworkIP().ToStd(),

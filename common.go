@@ -3,8 +3,10 @@ package vip
 //commmon ranges and such
 
 var (
+	//Multicast CIDR
 	Multicast = QuadMask(224, 0, 0, 0, 4)
-	SSDP      = Quad(239, 255, 255, 250)
+	//SSDP CIDR
+	SSDP = Quad(239, 255, 255, 250)
 )
 
 func quadSpread(n uint32) (uint8, uint8, uint8, uint8) {

@@ -31,12 +31,13 @@ func (m Mask) IP() IP {
 	return IP(uint32(MaxIP) & m.BitMask())
 }
 
-//IP representation of bit mask
+//ToStd ...
 func (m Mask) ToStd() net.IPMask {
 	a, b, c, d := quadSpread(m.BitMask())
 	return net.IPMask([]byte{a, b, c, d})
 }
 
+//MaskBytes ...
 func MaskBytes(b [4]byte) (Mask, error) {
 	target := quadJoin(b[0], b[1], b[2], b[3])
 	for b := uint8(32); b >= 0; b-- {
@@ -47,6 +48,7 @@ func MaskBytes(b [4]byte) (Mask, error) {
 	return Mask(0), errors.New("invalid mask")
 }
 
+//StdMask converts a standard-library mask
 func StdMask(m net.IPMask) (Mask, error) {
 	b := [4]byte{}
 	n := copy(b[:], m)

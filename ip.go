@@ -12,6 +12,9 @@ import (
 //IP represents a single IPv4 address
 type IP uint32
 
+//IPs is a slice of IP
+type IPs []IP
+
 //EmptyIP is 0.0.0.0
 var EmptyIP = IP(0)
 
@@ -106,19 +109,23 @@ func StdIP(ip net.IP) IP {
 	return Quad(v4[0], v4[1], v4[2], v4[3])
 }
 
+//ToStd converts a vip.IP to a standard-library net.IP
 func (ip IP) ToStd() net.IP {
 	a, b, c, d := ip.Quad()
 	return net.IP([]byte{a, b, c, d})
 }
 
+//IsMulticast returns whether IP is a multi-cast address
 func (ip IP) IsMulticast() bool {
 	return Multicast.Contains(ip)
 }
 
+//IsSSDP returns whether IP is an SSDP address
 func (ip IP) IsSSDP() bool {
 	return ip == SSDP
 }
 
+//Mask returns a CIDR
 func (ip IP) Mask(bits uint8) IPNet {
 	return IPNet{
 		IP:   ip,
