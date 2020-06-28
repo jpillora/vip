@@ -149,7 +149,7 @@ func StdNet(nw *net.IPNet) IPNet {
 	}
 }
 
-//ToStd ...
+//ToStd converts a vip.IPNet to a standard-library *net.IPNet
 func (nw IPNet) ToStd() net.IPNet {
 	return net.IPNet{
 		IP:   nw.NetworkIP().ToStd(),
