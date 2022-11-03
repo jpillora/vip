@@ -9,19 +9,19 @@ import (
 	"strings"
 )
 
-//IP represents a single IPv4 address
+// IP represents a single IPv4 address
 type IP uint32
 
-//IPs is a slice of IP
+// IPs is a slice of IP
 type IPs []IP
 
-//EmptyIP is 0.0.0.0
+// EmptyIP is 0.0.0.0
 var EmptyIP = IP(0)
 
-//MaxIP is 255.255.255.255
+// MaxIP is 255.255.255.255
 var MaxIP = Quad(255, 255, 255, 255)
 
-//Parse an IPv4 "dotted-quad"
+// Parse an IPv4 "dotted-quad"
 func Parse(ip string) (IP, error) {
 	q := strings.SplitN(ip, ".", 4)
 	if len(q) != 4 {
@@ -38,7 +38,7 @@ func Parse(ip string) (IP, error) {
 	return IP(u), nil
 }
 
-//MustParse panics on Parse failure
+// MustParse panics on Parse failure
 func MustParse(ip string) IP {
 	x, err := Parse(ip)
 	if err != nil {
@@ -52,12 +52,12 @@ func (ip IP) String() string {
 	return fmt.Sprintf("%d.%d.%d.%d", a, b, c, d)
 }
 
-//IsZero returns if the IP is 0.0.0.0
+// IsZero returns if the IP is 0.0.0.0
 func (ip IP) IsZero() bool {
 	return ip == EmptyIP
 }
 
-//Delta many spots from the IP
+// Delta many spots from the IP
 func (ip IP) Delta(d int64) IP {
 	n := int64(ip) + d
 	if n < 0 {
@@ -68,32 +68,32 @@ func (ip IP) Delta(d int64) IP {
 	return IP(n)
 }
 
-//Next IP after this one
+// Next IP after this one
 func (ip IP) Next() IP {
 	return ip.Delta(1)
 }
 
-//Prev IP before this one
+// Prev IP before this one
 func (ip IP) Prev() IP {
 	return ip.Delta(-1)
 }
 
-//Quad returns 4 bytes representing each quad
+// Quad returns 4 bytes representing each quad
 func (ip IP) Quad() (uint8, uint8, uint8, uint8) {
 	return quadSpread(uint32(ip))
 }
 
-//Quad returns 4 bytes representing each quad
+// Quad returns 4 bytes representing each quad
 func Quad(a uint8, b uint8, c uint8, d uint8) IP {
 	return IP(quadJoin(a, b, c, d))
 }
 
-//MarshalJSON allows IPNets to be json.Unmarshalled
+// MarshalJSON allows IPNets to be json.Unmarshalled
 func (ip IP) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + ip.String() + `"`), nil
 }
 
-//UnmarshalJSON allows IPNets to be json.Unmarshalled
+// UnmarshalJSON allows IPNets to be json.Unmarshalled
 func (ip *IP) UnmarshalJSON(b []byte) error {
 	tmp, err := Parse(strings.Trim(string(b), `"`))
 	if err != nil {
@@ -103,29 +103,34 @@ func (ip *IP) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-//StdIP converts a standard-library net.IP to a vip.IP
+// StdIP converts a standard-library net.IP to a vip.IP
 func StdIP(ip net.IP) IP {
 	v4 := ip.To4()
 	return Quad(v4[0], v4[1], v4[2], v4[3])
 }
 
-//ToStd converts a vip.IP to a standard-library net.IP
+// ToStd converts a vip.IP to a standard-library net.IP
 func (ip IP) ToStd() net.IP {
 	a, b, c, d := ip.Quad()
 	return net.IP([]byte{a, b, c, d})
 }
 
-//IsMulticast returns whether IP is a multi-cast address
+// IsMulticast returns whether IP is a multi-cast address
 func (ip IP) IsMulticast() bool {
 	return Multicast.Contains(ip)
 }
 
-//IsSSDP returns whether IP is an SSDP address
+// IsPrivate returns whether IP is a private address
+func (ip IP) IsPrivate() bool {
+	return Private10.Contains(ip) || Private172.Contains(ip) || Private192.Contains(ip)
+}
+
+// IsSSDP returns whether IP is an SSDP address
 func (ip IP) IsSSDP() bool {
 	return ip == SSDP
 }
 
-//Mask returns a CIDR
+// Mask returns a CIDR
 func (ip IP) Mask(bits uint8) IPNet {
 	return IPNet{
 		IP:   ip,
@@ -133,7 +138,7 @@ func (ip IP) Mask(bits uint8) IPNet {
 	}
 }
 
-//IPBytes 4 bytes to an vip.IP
+// IPBytes 4 bytes to an vip.IP
 func IPBytes(b [4]byte) IP {
 	return Quad(b[0], b[1], b[2], b[3])
 }

@@ -116,3 +116,19 @@ func TestNWJSON(t *testing.T) {
 		t.Fatalf("buff mismatch")
 	}
 }
+func TestPrivate(t *testing.T) {
+	for ip, private := range map[string]bool{
+		"1.2.3.4":     false,
+		"10.2.3.4":    true,
+		"192.2.3.4":   false,
+		"192.168.3.4": true,
+	} {
+		i, err := Parse(ip)
+		if err != nil {
+			t.Fatalf("parse err: %s", err)
+		}
+		if i.IsPrivate() != private {
+			t.Fatalf("expected private: %v", private)
+		}
+	}
+}

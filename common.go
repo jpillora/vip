@@ -7,6 +7,10 @@ var (
 	Multicast = QuadMask(224, 0, 0, 0, 4)
 	//SSDP CIDR
 	SSDP = Quad(239, 255, 255, 250)
+	//Private CIDR
+	Private10  = QuadMask(10, 0, 0, 0, 8)
+	Private172 = QuadMask(172, 16, 0, 0, 12)
+	Private192 = QuadMask(192, 168, 0, 0, 16)
 )
 
 func quadSpread(n uint32) (uint8, uint8, uint8, uint8) {
